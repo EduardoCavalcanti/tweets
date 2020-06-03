@@ -1,0 +1,43 @@
+version: '3.7'
+
+networks:
+  db-net:
+    
+volumes:
+  db-data:
+
+
+services:
+  api:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+    networks:
+      - db-net
+  
+  # migrations:
+  #   build: .
+  #   command: python manage.py migrate
+  #   volumes:
+  #     - .:/usr/src/app
+  #   depends_on:
+  #     - db
+  #   networks:
+  #     - db-net
+  #   restart: on-failure
+
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=secret
+    networks:
+      - db-net
+    volumes:
+      - db-data:/var/lib/postgresql/data
